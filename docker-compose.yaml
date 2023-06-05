@@ -1,0 +1,12 @@
+services:
+  parking:
+    container_name: parking
+    command: ./orangepiVideoDecoder
+    image: cpp_app:2.0
+    restart: always
+    volumes:
+      - ./config.json:/app/config.json
+    logging:
+      options:
+        max-size: 50m
+version: '2.1'

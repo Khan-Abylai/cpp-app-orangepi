@@ -1,0 +1,143 @@
+FROM arm64v8/debian
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt update -y && apt upgrade -y
+RUN apt install -y build-essential curl wget git tar unzip pkg-config cmake g++ sudo
+RUN apt install -y curl libcurl4 libcurl4-openssl-dev --fix-broken
+RUN apt install -y \
+    libjpeg-dev libtiff5-dev libpng-dev \
+    ffmpeg libavcodec-dev libavformat-dev libswscale-dev libxvidcore-dev libx264-dev libxine2-dev \
+    libv4l-dev v4l-utils \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    libgtk2.0-dev libcanberra-gtk* libgtk-3-dev libgtkgl2.0-dev libgtkglext1-dev \
+    libtbb2 libtbb-dev libdc1394-22-dev \
+    libopenblas-dev libatlas-base-dev libblas-dev \
+    mesa-utils libgl1-mesa-dri \
+    libatlas-base-dev liblapack-dev gfortran libhdf5-dev libeigen3-dev \
+    libprotobuf-dev libgoogle-glog-dev libgflags-dev \
+    protobuf-compiler
+
+RUN cd /tmp/ && \
+    sudo wget https://cmake.org/files/v3.25/cmake-3.25.1.tar.gz && \
+    sudo tar -zxf /tmp/cmake-3*.tar.gz && \
+    sudo rm /tmp/cmake-3*.tar.gz && \
+    cd /tmp/cmake-3* && \
+    sudo ./configure --system-curl && \
+    sudo make && \
+    sudo make install && \
+    cmake --version
+
+RUN apt install -y \
+    python3 python3-pip python3-dev python3-numpy && \
+    pip3 install --upgrade pip && \
+    pip3 install --upgrade setuptools && \
+    pip3 install --upgrade wheel && \
+    pip3 install numpy && \
+    pip3 install glob2 && \
+    python3 -V
+
+RUN apt-get install -y nlohmann-json3-dev &&  apt update -y && apt upgrade -y
+RUN sudo apt-get install libssl-dev
+
+RUN cd /tmp/ && git clone --recursive https://github.com/whoshuu/cpr.git && cd cpr && mkdir build && cd build && cmake .. && make -j4 && make install \
+&& cd /tmp/ && rm -rf cpr
+RUN cd /tmp/ && wget -O json-3.9.1.tar.gz https://github.com/nlohmann/json/archive/v3.9.1.tar.gz && tar xvzf json-3.9.1.tar.gz && cd json-3.9.1 && mkdir build && cd build \
+&& cmake  .. && make  && make install && rm -rf /tmp/json*
+
+RUN apt-get install -y cmake meson flex bison libglib2.0-dev libjpeg-dev libx264-dev libgtk2.0-dev libcanberra-gtk* libgtk-3-dev libasound2-dev
+
+RUN cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.18.4.tar.xz && sudo tar -xf gstreamer-1.18.4.tar.xz && cd gstreamer-1.18.4 \
+    && mkdir build && cd build && meson --prefix=/usr \
+                                          --wrap-mode=nofallback \
+                                          -D buildtype=release \
+                                          -D gst_debug=true \
+                                          -D package-origin=https://gstreamer.freedesktop.org/src/gstreamer/ \
+                                          -D package-name="GStreamer 1.18.4 BLFS" .. && ninja -j8 && ninja install && ldconfig
+
+
+RUN apt-get install -y libegl1-mesa-dev libglfw3-dev libgles2-mesa-dev
+
+RUN cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.18.4.tar.xz && sudo tar -xf gst-plugins-base-1.18.4.tar.xz && \
+    cd gst-plugins-base-1.18.4 && mkdir build && cd build && meson --prefix=/usr \
+                                                             -D gl_winsys=wayland \
+                                                             -D buildtype=release \
+                                                             -D package-origin=https://gstreamer.freedesktop.org/src/gstreamer/ .. && ninja -j8 && ninja install && ldconfig
+
+RUN apt-get install -y libjpeg-dev
+RUN cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.18.4.tar.xz && \
+    sudo tar -xf gst-plugins-good-1.18.4.tar.xz && cd gst-plugins-good-1.18.4 && mkdir build && cd build && \
+    meson --prefix=/usr       \
+           -D buildtype=release \
+           -D package-origin=https://gstreamer.freedesktop.org/src/gstreamer/ \
+           -D package-name="GStreamer 1.18.4 BLFS" .. && ninja -j8 && ninja install && ldconfig
+
+RUN apt install -y librtmp-dev libvo-aacenc-dev
+RUN cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.18.4.tar.xz && \
+    sudo tar -xf gst-plugins-bad-1.18.4.tar.xz && cd gst-plugins-bad-1.18.4 && mkdir build && cd build && \
+    meson --prefix=/usr       \
+           -D buildtype=release \
+           -D package-origin=https://gstreamer.freedesktop.org/src/gstreamer/ \
+           -D package-name="GStreamer 1.18.4 BLFS" .. && ninja -j8 && ninja install && ldconfig
+
+RUN cd /tmp/ && wget https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.18.4.tar.xz && \
+    sudo tar -xf gst-plugins-ugly-1.18.4.tar.xz && cd gst-plugins-ugly-1.18.4 && mkdir build && cd build && \
+    meson --prefix=/usr       \
+          -D buildtype=release \
+          -D package-origin=https://gstreamer.freedesktop.org/src/gstreamer/ \
+          -D package-name="GStreamer 1.18.4 BLFS" .. && ninja -j8 && ninja install && ldconfig
+
+RUN apt-get install -y libx264-dev && cd /tmp/ && cd gst-plugins-ugly-1.18.4 && rm -rf build && mkdir build && cd build && \
+    meson --prefix=/usr       \
+          -D buildtype=release \
+          -D package-origin=https://gstreamer.freedesktop.org/src/gstreamer/ \
+          -D package-name="GStreamer 1.18.4 BLFS" .. && ninja -j8 && ninja install && ldconfig
+
+RUN apt update -y && apt upgrade -y
+
+RUN cd /tmp/ && mkdir /tmp/opencv && cd /tmp/opencv && \
+    wget -O opencv.zip https://github.com/opencv/opencv/archive/4.5.5.zip && \
+    wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.5.5.zip && \
+    unzip opencv.zip && unzip opencv_contrib.zip && \
+    rm -f opencv.zip && rm -Rf opencv_contrib.zip && \
+    mv opencv-4.*/ opencv && mv opencv_contrib-4.*/ opencv_contrib && \
+    cd /tmp/opencv && mkdir -p build && cd build && \
+    cmake \
+    	-D CMAKE_BUILD_TYPE=RELEASE \
+    	-D CMAKE_INSTALL_PREFIX=/usr/local \
+    	-D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv/opencv_contrib/modules \
+    	-D ENABLE_NEON=ON \
+    	-D WITH_OPENMP=ON \
+    	-D WITH_OPENCL=OFF \
+    	-D BUILD_TIFF=ON \
+    	-D WITH_PNG=OFF \
+    	-D WITH_FFMPEG=OFF \
+    	-D WITH_GSTREAMER=ON \
+    	-D WITH_TBB=ON \
+    	-D BUILD_TBB=ON \
+    	-D BUILD_TESTS=OFF \
+    	-D WITH_EIGEN=OFF \
+    	-D WITH_V4L=ON \
+    	-D WITH_LIBV4L=ON \
+    	-D WITH_VTK=OFF \
+    	-D WITH_QT=OFF \
+    	-D OPENCV_ENABLE_NONFREE=ON \
+    	-D INSTALL_C_EXAMPLES=OFF \
+    	-D INSTALL_PYTHON_EXAMPLES=OFF \
+    	-D BUILD_NEW_PYTHON_SUPPORT=ON \
+    	-D BUILD_opencv_python3=TRUE \
+    	-D OPENCV_GENERATE_PKGCONFIG=ON \
+    	-D BUILD_EXAMPLES=OFF \
+    	../opencv/ && \
+    make -j$(nproc --all) && \
+    sudo make install && \
+    sudo ldconfig
+
+RUN cd /tmp/ && \
+    git clone --recursive --branch v1.12.0 https://github.com/Microsoft/onnxruntime && \
+    cd /tmp/onnxruntime/ && \
+    ./build.sh --config MinSizeRel --build_shared_lib --build_wheel --skip_tests --parallel $(nproc --all) && \
+    cd /tmp/onnxruntime/build/Linux/MinSizeRel && \
+    sudo make install
+
+RUN apt install -y gdb ssh gstreamer1.0-libav gstreamer1.0-plugins-bad
