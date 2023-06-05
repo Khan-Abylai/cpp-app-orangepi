@@ -26,7 +26,7 @@ void DetectionService::run() {
         auto frameData = frameQueue->wait_and_pop();
         if (frameData == nullptr) continue;
         auto frame = frameData->getFrame();
-
+        auto cameraScope = licensePlateRecognizerService->getCameraScope(frameData->getIp());
         auto startTime = chrono::high_resolution_clock::now();
         auto detectionResult = detection->detect(frame);
         auto endTime = chrono::high_resolution_clock::now();
@@ -35,10 +35,14 @@ void DetectionService::run() {
         if (detectionResult.empty()) continue;
 
         auto licensePlate = chooseOneLicensePlate(detectionResult);
+        licensePlate->setResultSendUrl(cameraScope.getResultSendURL());
         licensePlate->setPlateImage(frame); // perspective transform and set to plateImage
         licensePlate->setCameraIp(frameData->getIp());
         licensePlate->setCarImage(std::move(frame));
         licensePlate->setRTPtimestamp(frameData->getRTPtimestamp());
+
+
+
         licensePlateRecognizerService->addToQueue(std::move(licensePlate));
     }
 }

@@ -141,3 +141,6 @@ RUN cd /tmp/ && \
     sudo make install
 
 RUN apt install -y gdb ssh gstreamer1.0-libav gstreamer1.0-plugins-bad
+
+RUN cd /tmp/ && git clone https://github.com/whoshuu/cpr.git && cd cpr && mkdir build && cd build && \
+    cmake .. && make && sudo make install

@@ -30,10 +30,9 @@ void PackageSender::run() {
     while (!shutdownFlag) {
         auto package = packageQueue->wait_and_pop();
         if (package == nullptr) continue;
-
         LOG_INFO("%s %s %s", package->getCameraIp().data(), package->getPlateLabel().data(),
                  Utils::dateTimeToStr(time_t(nullptr)).c_str());
-
+        auto stop = 1;
         responses.push(sendRequests(package->getPackageJsonString(), package->getResultSendUrl()));
 
 

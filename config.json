@@ -2,14 +2,14 @@
   "cameras": [
     {
       "client_type": "simple",
-      "camera_ip": "10.66.63.21",
-      "rtsp_url": "rtsp://admin:campas123@172.27.14.171/cam/realmonitor?channel=1&subtype=0",
+      "camera_ip": "10.66.112.21",
+      "rtsp_url": "rtsp://admin:campas123.@10.66.112.21/media/video",
       "use_direction": 0,
       "time_between_sent_plates": 4,
       "plates_count": 2,
-      "result_send_endpoint": "http://10.66.5.25:8888/rest/cars/event",
-      "node_ip": "http://10.66.5.25:8888/rest/camera/getCalibrationByIp/",
-      "snapshot_send_ip": "http://10.66.5.25:8888/rest/arm/picture"
+      "result_send_endpoint": "http://10.66.100.156:8888/rest/cars/event",
+      "node_ip": "http://10.66.100.156:8888/rest/camera/getCalibrationByIp/",
+      "snapshot_send_ip": "http://10.66.100.156:8888/rest/arm/picture"
     }
   ],
   "time_between_snapshot_send": 1,
