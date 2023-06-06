@@ -13,10 +13,11 @@ void DetectionService::shutdown() {
 }
 
 DetectionService::DetectionService(std::shared_ptr<SharedQueue<std::unique_ptr<FrameData>>> frameQueue,
+                                   const std::shared_ptr<SharedQueue<std::shared_ptr<Snapshot>>> &snapshotQueue,
                                    const std::string &cameraIp,
                                    std::shared_ptr<LPRecognizerService> lpRecognizerService) : ILogger(
         "DetectionService"), frameQueue{std::move(frameQueue)}, licensePlateRecognizerService{
-        std::move(lpRecognizerService)} {
+        std::move(lpRecognizerService)}, snapshotQueue{snapshotQueue} {
     LOG_INFO("Camera ip: %s", cameraIp.c_str());
     this->detection = make_shared<Detection>();
 }
@@ -27,11 +28,20 @@ void DetectionService::run() {
         if (frameData == nullptr) continue;
         auto frame = frameData->getFrame();
         auto cameraScope = licensePlateRecognizerService->getCameraScope(frameData->getIp());
+
+
+        lastFrameRTPTimestamp = time(nullptr);
+        if (lastFrameRTPTimestamp - lastTimeSnapshotSent >= timeBetweenSendingSnapshots &&
+            !cameraScope.getSnapshotSendUrl().empty()) {
+            auto snapshot = make_shared<Snapshot>(frameData->getIp(), frame, cameraScope.getSnapshotSendUrl());
+            snapshotQueue->push(std::move(snapshot));
+            lastTimeSnapshotSent = time(nullptr);
+        }
+
+
         auto startTime = chrono::high_resolution_clock::now();
         auto detectionResult = detection->detect(frame);
         auto endTime = chrono::high_resolution_clock::now();
-
-
         if (detectionResult.empty()) continue;
 
         auto licensePlate = chooseOneLicensePlate(detectionResult);
@@ -40,7 +50,6 @@ void DetectionService::run() {
         licensePlate->setCameraIp(frameData->getIp());
         licensePlate->setCarImage(std::move(frame));
         licensePlate->setRTPtimestamp(frameData->getRTPtimestamp());
-
 
 
         licensePlateRecognizerService->addToQueue(std::move(licensePlate));

@@ -14,6 +14,8 @@
 #include "Config.h"
 #include "app/Package.h"
 #include "app/PackageSender.h"
+#include "app/Snapshot.h"
+#include "app/SnapshotSender.h"
 
 using namespace std;
 
@@ -48,8 +50,10 @@ int main(int argc, char *argv[]) {
     if (!Config::parseJson(configFileName))
         return -1;
     vector<shared_ptr<IThreadLauncher>> services;
+    auto snapshotQueue = make_shared<SharedQueue<shared_ptr<Snapshot>>>();
     auto packageQueue = make_shared<SharedQueue<shared_ptr<Package>>>();
     vector<shared_ptr<SharedQueue<unique_ptr<FrameData>>>> frameQueues;
+
     auto cameras = Config::getCameras();
 
     auto lpRecognizerService = make_shared<LPRecognizerService>(packageQueue, cameras, Config::getRecognizerThreshold(),
@@ -58,7 +62,8 @@ int main(int argc, char *argv[]) {
 
     for (const auto &camera: cameras) {
         auto frameQueue = make_shared<SharedQueue<unique_ptr<FrameData>>>();
-        auto detectionService = make_shared<DetectionService>(frameQueue, camera.getCameraIp(), lpRecognizerService);
+        auto detectionService = make_shared<DetectionService>(frameQueue, snapshotQueue, camera.getCameraIp(),
+                                                              lpRecognizerService);
         frameQueues.push_back(std::move(frameQueue));
         services.emplace_back(detectionService);
     }
@@ -70,6 +75,9 @@ int main(int argc, char *argv[]) {
 
     auto packageSender = make_shared<PackageSender>(packageQueue, Config::getCameras());
     services.emplace_back(packageSender);
+
+    auto snapshotSender = make_shared<SnapshotSender>(snapshotQueue, Config::getCameras());
+    services.emplace_back(snapshotSender);
 
     vector<thread> threads;
     for (const auto &service: services) {

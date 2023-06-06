@@ -12,12 +12,14 @@
 
 #include "DetectionMobilenet.h"
 #include "LPRecognizerService.h"
+#include "Snapshot.h"
 
 class DetectionService : public IThreadLauncher, public ILogger {
 
 
 public:
     explicit DetectionService(std::shared_ptr<SharedQueue<std::unique_ptr<FrameData>>> frameQueue,
+                              const std::shared_ptr<SharedQueue<std::shared_ptr<Snapshot>>> &snapshotQueue,
                               const std::string &cameraIp, std::shared_ptr<LPRecognizerService> lpRecognizerService);
 
     void run() override;
@@ -31,6 +33,7 @@ private:
 
     std::shared_ptr<Detection> detection;
     std::shared_ptr<SharedQueue<std::unique_ptr<FrameData>>> frameQueue;
+    std::shared_ptr<SharedQueue<std::shared_ptr<Snapshot>>> snapshotQueue;
     std::shared_ptr<LPRecognizerService> licensePlateRecognizerService;
 
     static std::shared_ptr<LicensePlate> getMaxAreaPlate(std::vector<std::shared_ptr<LicensePlate>> &licensePlates);
