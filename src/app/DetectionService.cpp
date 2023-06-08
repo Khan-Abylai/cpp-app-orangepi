@@ -19,7 +19,8 @@ DetectionService::DetectionService(std::shared_ptr<SharedQueue<std::unique_ptr<F
         "DetectionService"), frameQueue{std::move(frameQueue)}, licensePlateRecognizerService{
         std::move(lpRecognizerService)}, snapshotQueue{snapshotQueue} {
     LOG_INFO("Camera ip: %s", cameraIp.c_str());
-    this->detection = make_shared<Detection>();
+//    this->detection = make_shared<Detection>();
+    this->detectionMobilenet = make_shared<DetectionMobilenet>();
 }
 
 void DetectionService::run() {
@@ -40,7 +41,8 @@ void DetectionService::run() {
 
 
         auto startTime = chrono::high_resolution_clock::now();
-        auto detectionResult = detection->detect(frame);
+//        auto detectionResult = detection->detect(frame);
+        auto detectionResult = detectionMobilenet->detect(frame);
         auto endTime = chrono::high_resolution_clock::now();
         if (detectionResult.empty()) continue;
 

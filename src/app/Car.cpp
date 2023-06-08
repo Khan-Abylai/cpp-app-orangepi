@@ -143,5 +143,5 @@ bool Car::doesPlatesDoubleCollected() {
     int platesCollected = 0;
     for (const auto &plate: licensePlates) platesCollected += plate->getNumberOfOccurrence();
 
-    return (int) MIN_NUM_PLATES_COLLECTED < platesCollected;
+    return (int) MIN_NUM_PLATES_COLLECTED <= platesCollected;
 }

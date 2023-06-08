@@ -11,7 +11,7 @@ namespace Constants {
     const std::string IMAGE_DIRECTORY = "./images/";
 
     const std::string detectorModelFilepath{"./models/detector.onnx"};
-    const std::string detectorMobilenetModelFilepath{"./models/carcity_mobilenet640x480last.onnx"};
+    const std::string detectorMobilenetModelFilepath{"./models/plate_new.onnx"};
     const std::string recognizerModelFilepath{"./models/recognizer.onnx"};
 
 

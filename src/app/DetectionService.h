@@ -32,6 +32,7 @@ private:
     int timeBetweenSendingSnapshots = 1;
 
     std::shared_ptr<Detection> detection;
+    std::shared_ptr<DetectionMobilenet> detectionMobilenet;
     std::shared_ptr<SharedQueue<std::unique_ptr<FrameData>>> frameQueue;
     std::shared_ptr<SharedQueue<std::shared_ptr<Snapshot>>> snapshotQueue;
     std::shared_ptr<LPRecognizerService> licensePlateRecognizerService;

@@ -1,4 +1,4 @@
-FROM cpp:3.0
+FROM registry.infra.smartparking.kz/parking_cpp_orangepi_base:1.0
 
 RUN mkdir -p /app
 WORKDIR /app

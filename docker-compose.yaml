@@ -2,7 +2,7 @@ services:
   parking:
     container_name: parking
     command: ./orangepiVideoDecoder
-    image: cpp_app:2.0
+    image: registry.infra.smartparking.kz/parking_cpp_orangepi:1.2
     restart: always
     volumes:
       - ./config.json:/app/config.json
