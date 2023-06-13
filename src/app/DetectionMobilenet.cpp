@@ -27,6 +27,7 @@ DetectionMobilenet::DetectionMobilenet() {
     outputNames.push_back(session.GetOutputName(0, allocator));
     outputNames.push_back(session.GetOutputName(1, allocator));
     outputNames.push_back(session.GetOutputName(2, allocator));
+    auto stop = 1;
     create_anchor(anchor, IMG_W, IMG_H);
 
 }

@@ -13,6 +13,7 @@
 #include "DetectionMobilenet.h"
 #include "LPRecognizerService.h"
 #include "Snapshot.h"
+#include "DetectionNCNN.h"
 
 class DetectionService : public IThreadLauncher, public ILogger {
 

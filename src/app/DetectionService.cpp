@@ -21,6 +21,15 @@ DetectionService::DetectionService(std::shared_ptr<SharedQueue<std::unique_ptr<F
     LOG_INFO("Camera ip: %s", cameraIp.c_str());
 //    this->detection = make_shared<Detection>();
     this->detectionMobilenet = make_shared<DetectionMobilenet>();
+//    ncnn::Net det;
+//    det.opt.use_vulkan_compute = true;
+//
+//    if (det.load_param("../models/detector.param"))
+//        exit(-1);
+//    if (det.load_model("../models/detector.bin"))
+//        exit(-1);
+//    ncnn::Extractor ex = det.create_extractor();
+//    this->detectionNCNN = make_shared<DetectionNCNN>(ex);
 }
 
 void DetectionService::run() {
@@ -43,6 +52,7 @@ void DetectionService::run() {
         auto startTime = chrono::high_resolution_clock::now();
 //        auto detectionResult = detection->detect(frame);
         auto detectionResult = detectionMobilenet->detect(frame);
+//        auto detectionResult = detectionNCNN->detect(frame);
         auto endTime = chrono::high_resolution_clock::now();
         if (detectionResult.empty()) continue;
 
