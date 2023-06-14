@@ -15,9 +15,9 @@ std::vector<std::shared_ptr<LicensePlate>> DetectionNCNN::detect(const cv::Mat &
     ncnn::Net det;
     det.opt.use_vulkan_compute = true;
 
-    if (det.load_param("../models/detector.param"))
+    if (det.load_param("./models/detector.param"))
         exit(-1);
-    if (det.load_model("../models/detector.bin"))
+    if (det.load_model("./models/detector.bin"))
         exit(-1);
     ncnn::Extractor ex = det.create_extractor();
     cv::Mat copyImage;
