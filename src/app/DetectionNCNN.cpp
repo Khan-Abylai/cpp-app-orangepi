@@ -4,11 +4,22 @@
 
 #include "DetectionNCNN.h"
 
-DetectionNCNN::DetectionNCNN(const ncnn::Extractor &ex) : ex(ex) {
+DetectionNCNN::DetectionNCNN() {
     create_anchor(anchor, IMG_W, IMG_H);
+
+
+
 }
 
 std::vector<std::shared_ptr<LicensePlate>> DetectionNCNN::detect(const cv::Mat &frame) {
+    ncnn::Net det;
+    det.opt.use_vulkan_compute = true;
+
+    if (det.load_param("../models/detector.param"))
+        exit(-1);
+    if (det.load_model("../models/detector.bin"))
+        exit(-1);
+    ncnn::Extractor ex = det.create_extractor();
     cv::Mat copyImage;
     frame.copyTo(copyImage);
     cv::Mat resized;

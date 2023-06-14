@@ -9,7 +9,7 @@
 using namespace std;
 class DetectionNCNN {
 public:
-    explicit DetectionNCNN(const ncnn::Extractor& ex);
+    explicit DetectionNCNN();
 
     std::vector<std::shared_ptr<LicensePlate>> detect(const cv::Mat &frame);
 
@@ -53,7 +53,6 @@ private:
     std::vector<float> makeFlattened(ncnn::Mat &val);
     static inline bool cmp(bbox a, bbox b);
 
-    ncnn::Extractor ex;
 };
 
 
