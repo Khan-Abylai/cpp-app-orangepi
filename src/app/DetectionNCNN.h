@@ -10,7 +10,7 @@ using namespace std;
 class DetectionNCNN {
 public:
     explicit DetectionNCNN();
-
+    ~DetectionNCNN();
     std::vector<std::shared_ptr<LicensePlate>> detect(const cv::Mat &frame);
 
 private:
@@ -52,7 +52,7 @@ private:
     void nms(std::vector<bbox> &input_boxes, float NMS_THRESH);
     std::vector<float> makeFlattened(ncnn::Mat &val);
     static inline bool cmp(bbox a, bbox b);
-
+    ncnn::Net det{};
 };
 
 

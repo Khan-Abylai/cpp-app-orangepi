@@ -7,18 +7,17 @@
 DetectionNCNN::DetectionNCNN() {
     create_anchor(anchor, IMG_W, IMG_H);
 
-
-
-}
-
-std::vector<std::shared_ptr<LicensePlate>> DetectionNCNN::detect(const cv::Mat &frame) {
-    ncnn::Net det;
     det.opt.use_vulkan_compute = true;
 
     if (det.load_param("./models/detector.param"))
         exit(-1);
     if (det.load_model("./models/detector.bin"))
         exit(-1);
+}
+
+std::vector<std::shared_ptr<LicensePlate>> DetectionNCNN::detect(const cv::Mat &frame) {
+
+
     ncnn::Extractor ex = det.create_extractor();
     cv::Mat copyImage;
     frame.copyTo(copyImage);
@@ -122,6 +121,11 @@ std::vector<std::shared_ptr<LicensePlate>> DetectionNCNN::detect(const cv::Mat &
 
     std::vector<std::shared_ptr<LicensePlate>> lp_vector;
     lp_vector.push_back(lp);
+    ex.clear();
+
+    output1Raw.release();
+    output2Raw.release();
+    output3Raw.release();
     return lp_vector;
 }
 
@@ -190,4 +194,8 @@ std::vector<float> DetectionNCNN::makeFlattened(ncnn::Mat &val) {
     }
 
     return output1;
+}
+
+DetectionNCNN::~DetectionNCNN() {
+    det.clear();
 }
