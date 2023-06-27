@@ -3,11 +3,12 @@
 using namespace std;
 
 MaskCarTracker::MaskCarTracker(shared_ptr<SharedQueue<shared_ptr<Package>>> packageQueue,
-                               const shared_ptr<CalibParams> &calibParams, bool useDirection,
-                               int platesCount, int timeBetweenResendingPlates)
-        : BaseCarTracker(std::move(packageQueue), calibParams->getCameraIp()), calibParams{(calibParams)},
-          platesCount{platesCount}, timeBetweenResendingPlates{timeBetweenResendingPlates},
-          USE_DIRECTION{useDirection} {
+                               const shared_ptr<CalibParams> &calibParams, bool useDirection, int platesCount,
+                               int timeBetweenResendingPlates) : BaseCarTracker(std::move(packageQueue),
+                                                                                calibParams->getCameraIp()),
+                                                                 calibParams{(calibParams)}, platesCount{platesCount},
+                                                                 timeBetweenResendingPlates{timeBetweenResendingPlates},
+                                                                 USE_DIRECTION{useDirection} {
 }
 
 void MaskCarTracker::track(const shared_ptr<LicensePlate> &licensePlate) {
@@ -33,7 +34,6 @@ void MaskCarTracker::track(const shared_ptr<LicensePlate> &licensePlate) {
 
     if (isSufficientMomentToSendLP(licensePlate, "main") && !isPlateAlreadySent) {
         if ((currentCar->getDirection() == Directions::forward && currentCar->doesPlatesCollected()) ||
-            (currentCar->getDirection() == Directions::reverse && currentCar->doesPlatesCollected()) ||
             (!USE_DIRECTION && currentCar->doesPlatesCollected())) {
             sendMostCommonPlate();
         }
